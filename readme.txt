@@ -1,4 +1,4 @@
 testing
-Making a commit
+Making a new commit
 
 Minsu Test
