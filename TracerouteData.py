@@ -2,15 +2,15 @@ from subprocess import Popen, PIPE
 from re import findall
 
 class TracerouteData:
-	flags = {
-				"m":"255",
-				"q":"1",
-				"I":"",
-				"n":""
-			}
 
 	def __init__(self, dest):
 		self.dest = dest
+		self.flags = 	{
+							"m":"255",
+							"q":"1",
+							"I":"",
+							"n":""
+						}
 
 	def updateProtocol(self, protocol):
 		switcher = {
@@ -44,4 +44,4 @@ class TracerouteData:
 		process = Popen(self.traceroute2List(), stdout=PIPE)
 		output = process.communicate()[0]
 		output = findall("(?:[0-9]{1,3}\.){3}[0-9]{1,3}",output)[1:]
-		print(output)
+		return output
