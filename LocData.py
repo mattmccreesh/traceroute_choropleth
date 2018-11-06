@@ -9,11 +9,17 @@ class LocData:
         self.states = []
         self.coords = []
         self.FIPS = []
+        self.FipsDict = {}
         for address in ipAddrs:
             g = ip(address)
             self.states.append(g.state)
             self.coords.append(g.latlng)
-            self.FIPS.append(self.getFIPS(g.lat, g.lng))
+            fip = self.getFIPS(g.lat, g.lng)
+            self.FIPS.append(fip)
+            if fip not in self.FipsDict:
+                self.FipsDict[fip] = 1
+            else:
+                self.FipsDict[fip] = self.FipsDict[fip] + 1
 
     def getFIPS(self, lat, lon):
         params = urlencode({'latitude': lat, 'longitude':lon, 'format':'json'})
