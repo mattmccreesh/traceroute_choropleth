@@ -40,9 +40,16 @@ class TracerouteData:
 		tr.append(self.dest)
 		return tr
 
+	def removeLocalIPs(self,ipAddrs):
+		for address in ipAddrs:
+			if(address.find("192.168") != -1):
+				ipAddrs.remove(address)
+		return ipAddrs
+
 	def genIPs(self):
 		process = Popen(self.traceroute2List(), stdout=PIPE)
 		output = process.communicate()[0]
 		output = output[output.find("\n")+1:]
 		output = findall("(?:[0-9]{1,3}\.){3}[0-9]{1,3}",output)
+		output = self.removeLocalIPs(output)
 		return output
