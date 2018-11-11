@@ -5,12 +5,12 @@ class TracerouteData:
 
 	def __init__(self, dest):
 		self.dest = dest
-		self.flags = 	{
-							"m":"255",
-							"q":"1",
-							"I":"",
-							"n":""
-						}
+		self.flags=	{
+						"m":"255",
+						"q":"1",
+						"I":"",
+						"n":""
+					}
 
 	def updateProtocol(self, protocol):
 		switcher = {
@@ -19,6 +19,9 @@ class TracerouteData:
 			"UDPLITE":"UL",
 			"UDP":"U"
 		}
+		for value in switcher.values():
+			if value in self.flags:
+				del self.flags[value]
 		if protocol in switcher:
 			self.flags[switcher[protocol]] = ""
 		else:
