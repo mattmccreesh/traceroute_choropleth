@@ -14,10 +14,10 @@ class TracerouteData:
 
 	def updateProtocol(self, protocol):
 		switcher = {
-			"ICMP":"-I",
-			"TCP":"-T",
-			"UDPLITE":"-UL",
-			"UDP":"-U"
+			"ICMP":"I",
+			"TCP":"T",
+			"UDPLITE":"UL",
+			"UDP":"U"
 		}
 		if protocol in switcher:
 			self.flags[switcher[protocol]] = ""
@@ -43,5 +43,6 @@ class TracerouteData:
 	def genIPs(self):
 		process = Popen(self.traceroute2List(), stdout=PIPE)
 		output = process.communicate()[0]
-		output = findall("(?:[0-9]{1,3}\.){3}[0-9]{1,3}",output)[1:]
+		output = output[output.find("\n")+1:]
+		output = findall("(?:[0-9]{1,3}\.){3}[0-9]{1,3}",output)
 		return output
