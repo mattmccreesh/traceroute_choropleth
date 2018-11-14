@@ -1,8 +1,15 @@
-from geocoder import maxmind
-from geocoder import geocodefarm
 from requests import get
 from time import sleep
 from urllib import urlencode
+
+#to provide similar objects to geocoder
+#allows us to have more modularity
+class GeoData(object):
+    def __init__(self, country, state, lat, lng):
+        self.country = country
+        self.state = state
+        self.lat = lat
+        self.lng = lng
 
 class LocData:
     
@@ -30,10 +37,22 @@ class LocData:
         else:
             print("Bad Response from FCC")
 
+    #replaces geocoder module with GET reqeust to API to avoid query limit
+    def getGeoDataFromIP(self, testIP):
+        sleep(0.25)
+        url = 'http://api.petabyet.com/geoip/' + testIP
+        response = get(url)
+        jsonData = response.json()
+        lat = jsonData['latitude']
+        lng = jsonData['longitude']
+        country = jsonData['country']
+        state = jsonData['region']
+        return GeoData(country, state, lat, lng)
+
     def genFIPSList(self, ipAddrs):
         self.ipAddrs.extend(ipAddrs)
         for address in ipAddrs:
-            g = maxmind(address)
+            g = self.getGeoDataFromIP(address)
             self.countries.append(g.country)
             self.states.append(g.state)
             self.coords.append([g.lat,g.lng])
