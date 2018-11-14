@@ -10,14 +10,14 @@ from LocData import LocData
 
 class Choropleth:
 
-	def _init_(self,locData):
+	def __init__(self,locData):
 		self.locData = locData
 
 	def plotData(self):
 		plottools.set_credentials_file(username='mintyshoes', api_key='6EAJ1duK8IeBcbjMuoEg')
 
-		fips = self.locData.FipsDict.keys()
-		values = self.locData.FipsDict.values()
+		fips = self.locData.keys()
+		values = self.locData.values()
 
 		fig = ff.create_choropleth(
 		    fips=fips, values=values, scope=['USA'],
