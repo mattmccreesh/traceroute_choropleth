@@ -22,7 +22,6 @@ class LocData:
         self.FipsDict = {}
 
     def getFIPSbyLatLong(self, lat, lon):
-        sleep(1)
         params = urlencode({'latitude': lat, 'longitude':lon, 'format':'json'})
         url = 'https://geo.fcc.gov/api/census/block/find?' + params
         response = get(url)
@@ -43,10 +42,14 @@ class LocData:
         url = 'http://api.petabyet.com/geoip/' + testIP
         response = get(url)
         jsonData = response.json()
+        # print(jsonData)
         lat = jsonData['latitude']
         lng = jsonData['longitude']
         country = jsonData['country']
-        state = jsonData['region']
+        if 'region' in jsonData.keys():
+            state = jsonData['region']
+        else:
+            state = ""
         return GeoData(country, state, lat, lng)
 
     def genFIPSList(self, ipAddrs):
