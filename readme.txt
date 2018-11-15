@@ -1,2 +1,1 @@
-This project was originally used as a Git demo
-Now it is used for the TCPIP project
+This is a Choropleth project by Matt McCreesh and Min Su Park, which translates ip addresses to a county heatmap.
