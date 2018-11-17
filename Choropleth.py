@@ -21,9 +21,7 @@ class Choropleth:
 		values = data.values()
 		intervals = range(0,51,5)
 
-		colors = ["#ffffe0", "#ffffe0", "#ffd196", "#ffb67f", "#ff9b6f", "#f98065", "#ee665d", "#e14d54", "#cf3548", "#bb1e37", "#a40921", "#8b0000"]
-		# colors = ["#FFFED1","#FFEAB6","#FFD5A6","#FFC096","#FFAB85","#FF9675","#FF8265","#FF6D55","#FF5844","#FF4334","#FF2E24","#FF1A14"]
-		# colors = ['#FAFF70','#FAEB69','#FAD862','#FBC55B','#FBB154','#FC9E4D','#FC8B46','#FD783F','#FD6438','#FE5131','#FE3E2A','#FF2B24']
+		colors = ['#F8F8F8','#ffffe0','#ffe6b2','#ffcb91','#ffae79','#fe906a','#f47461','#e75758','#d53c4c','#c0223b','#a70b24','#8b0000']
 
 		fig = ff.create_choropleth(
 			fips=fips, values=values, scope=['USA'],
