@@ -4,13 +4,18 @@ from re import findall
 class TracerouteData:
 
 	def __init__(self, dest):
-		self.dest = dest
+		if type(dest) is list:
+			self.dest = dest
+		else:
+			self.dest = [dest]
 		self.flags=	{
 						"m":"255",
 						"q":"1",
 						"I":"",
 						"n":""
 					}
+		self.ipsList = []
+		self.ipsDict = {}
 
 	def updateProtocol(self, protocol):
 		switcher = {
@@ -40,7 +45,6 @@ class TracerouteData:
 			if value != "":
 				option += " " + value
 			tr.append(option)
-		tr.append(self.dest)
 		return tr
 
 	def removeLocalIPs(self,ipAddrs):
@@ -49,10 +53,25 @@ class TracerouteData:
 				ipAddrs.remove(address)
 		return ipAddrs
 
+	def genIPsList(self):
+		result = []
+		for ip in self.dest:
+			process = Popen(self.traceroute2List() + [ip], stdout=PIPE)		# Initialize Popen
+			output = process.communicate()[0]								# Get output
+			output = output[output.find("\n")+1:]							# Skip the first line
+			output = findall("(?:[0-9]{1,3}\.){3}[0-9]{1,3}",output)		# Get IP
+			output = self.removeLocalIPs(output)							# Remove all Local IPs since they don't have location data
+			result += output
+			print("Done with Traceroute of IP: " + ip)
+		self.ipsList = result
+	
+	def genIPsDict(self):
+		for ip in self.ipsList:
+			if ip in self.ipsDict:
+				self.ipsDict[ip] += 1
+			else:
+				self.ipsDict[ip] = 1
+
 	def genIPs(self):
-		process = Popen(self.traceroute2List(), stdout=PIPE)
-		output = process.communicate()[0]
-		output = output[output.find("\n")+1:]
-		output = findall("(?:[0-9]{1,3}\.){3}[0-9]{1,3}",output)
-		output = self.removeLocalIPs(output)
-		return output
+		self.genIPsList()
+		self.genIPsDict()

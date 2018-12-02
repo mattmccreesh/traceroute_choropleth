@@ -16,6 +16,7 @@ class LocData:
 	def __init__(self):
 		self.ipAddrs = []
 		self.coords = []
+		self.counties = []
 		self.states = []
 		self.countries = []
 		self.FipsList = []
@@ -28,47 +29,58 @@ class LocData:
 			self.FipsDict[FIPS] = 0
 		counties_text_file.close()
 
-	def getFIPSbyLatLong(self, address,lat, lon):
+	def getFIPSbyLatLong(self, address, lat, lon):
 		params = urlencode({'latitude': lat, 'longitude':lon, 'format':'json'})
 		url = 'https://geo.fcc.gov/api/census/block/find?' + params
 		response = get(url)
 		# print(str(lat) + "," + str(lon))
-		if response.text.find("<html>") == -1:
-			# print(response)
+		if response.text.find("<html>") == -1 and response.json() is not None and response.json()['County']['FIPS'] is not None:
+			self.counties.append(response.json()['County']['name'] + ", " + response.json()['State']['name'])
 			self.ipResponse[address] = response
 			data = response.json()['County']['FIPS']
-			if data is not None:
-				return data.encode('ascii','ignore')
-			else:
-				print("FCC FIPS is None")
+			return data.encode('ascii','ignore')
 		else:
-			print("Bad Response from FCC")
+			print("Bad Response from FCC for ip (" + address + ")\n")
+			print(response.json())
 
 	#replaces geocoder module with GET reqeust to API to avoid query limit
-	def getGeoDataFromIP(self, testIP):
+	def getGeoDataFromIP(self, ip):
 		# sleep(0.25)
-		url = 'http://api.petabyet.com/geoip/' + testIP
+		url = 'http://api.petabyet.com/geoip/' + ip
 		response = get(url)
 		jsonData = response.json()
 		# print(jsonData)
-		lat = jsonData['latitude']
-		lng = jsonData['longitude']
-		country = jsonData['country']
-		if 'region' in jsonData.keys():
-			state = jsonData['region']
+		if 'latitude' in jsonData.keys() and 'longitude' in jsonData.keys():
+			lat = jsonData['latitude']
+			lng = jsonData['longitude']
 		else:
-			state = ""
+			print("Error: \'" + ip + "\' does not have a longitude or latitude.")
+			print(jsonData)
+			raw_input("Paused\n")
+		if 'country' not in jsonData.keys():
+			print("Error: \'" + ip + "\' does not have a country.")
+			# print(jsonData)
+			country = 'N/A'
+		else:
+			country = jsonData['country']
+		if 'region' not in jsonData.keys():
+			print("Error: \'" + ip + "\' does not have a state.")
+			# print(jsonData)
+			state = 'N/A'
+		else:
+			state = jsonData['region']
 		return GeoData(country, state, lat, lng)
 
-	def genFIPSList(self, ipAddrs):
-		self.ipAddrs.extend(ipAddrs)
-		for address in ipAddrs:
-			g = self.getGeoDataFromIP(address)
+	# Takes a dictionary with an IP Address as key and Count as Value
+	def genFIPS(self, ipAddrs):
+		self.ipAddrs = ipAddrs.keys()
+		for ip in self.ipAddrs:
+			g = self.getGeoDataFromIP(ip)
 			self.countries.append(g.country)
 			self.states.append(g.state)
 			self.coords.append([g.lat,g.lng])
-			fip = self.getFIPSbyLatLong(address,g.lat, g.lng)
+			fip = self.getFIPSbyLatLong(ip, g.lat, g.lng)
 			if fip is not None:
 				self.FipsList.append(fip)
-				self.FipsDict[fip] += 1
-
+				self.FipsDict[fip] += ipAddrs[ip]
+			print("Done generating FIPS of IP: " + ip)

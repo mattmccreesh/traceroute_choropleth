@@ -3,18 +3,26 @@ from Choropleth import Choropleth
 from LocData import LocData
 
 # Choropleth.openHelp()
+
+filename = "westcoastips.txt"
+ips_file = open(filename,"r")
+input_ips = []
+for line in ips_file:
+	input_ips.append(line.strip())
 locData = LocData()
-for number in range(0,10):
-	# trData = TracerouteData("172.64.111.36")	# Cali
-	trData = TracerouteData("128.95.155.197") 	# Washington State
-	trData.updateProtocol("ICMP")
-	ips = trData.genIPs()
-	print(ips)
-	locData.genFIPSList(ips)
-print(locData.FipsList)
+print(input_ips)
+trData = TracerouteData(input_ips) 	
+trData.updateProtocol("ICMP")
+output_ips = trData.genIPs()
+output_dict = trData.ipsDict
+print(trData.ipsDict)
+locData.genFIPS(output_dict)
 # print(locData.FipsDict)
+print(locData.FipsList)
+print(locData.counties)
 # print(locData.countries)
 
 choropleth = Choropleth(locData.FipsDict)
 choropleth.createPlot()
+# choropleth = Choropleth({})
 # choropleth.testPlot()
