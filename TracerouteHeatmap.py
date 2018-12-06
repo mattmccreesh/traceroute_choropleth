@@ -4,7 +4,7 @@ from LocData import LocData
 
 # Choropleth.openHelp()
 
-filename = "westcoastips.txt"
+filename = "ips.txt"
 ips_file = open(filename,"r")
 input_ips = []
 for line in ips_file:
